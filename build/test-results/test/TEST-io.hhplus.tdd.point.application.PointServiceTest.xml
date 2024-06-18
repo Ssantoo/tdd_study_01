@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="io.hhplus.tdd.point.application.PointServiceTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2024-06-17T14:25:09" hostname="nowui-MacBookPro.local" time="0.673">
+  <properties/>
+  <testcase name="사용자의_포인트를_조회_한다1()" classname="io.hhplus.tdd.point.application.PointServiceTest" time="0.673"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
