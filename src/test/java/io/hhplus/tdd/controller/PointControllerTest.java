@@ -1,6 +1,8 @@
 package io.hhplus.tdd.controller;
 
 import io.hhplus.tdd.point.application.PointService;
+import io.hhplus.tdd.point.domain.PointHistory;
+import io.hhplus.tdd.point.domain.TransactionType;
 import io.hhplus.tdd.point.domain.UserPoint;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -60,5 +64,43 @@ public class PointControllerTest {
                 .andExpect(jsonPath("$.message").value("에러가 발생했습니다."));
     }
 
+    //포인트 히스토리를 조회한다
+    @Test
+    void 포인트_히스토리를_조회한다() throws Exception {
+        //given
+        long userId = 1L;
+        List<PointHistory> histories = List.of(
+                new PointHistory(1L, userId, 100, TransactionType.CHARGE, System.currentTimeMillis()),
+                new PointHistory(2L, userId, -100, TransactionType.USE, System.currentTimeMillis())
+        );
+        given(pointService.getPointHistory(userId)).willReturn(histories);
 
+        //when
+        //then
+        mockMvc.perform(get("/point/{id}/histories", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].userId").value(userId))
+                .andExpect(jsonPath("$[0].amount").value(100))
+                .andExpect(jsonPath("$[0].type").value("CHARGE"))
+                .andExpect(jsonPath("$[1].id").value(2L))
+                .andExpect(jsonPath("$[1].userId").value(userId))
+                .andExpect(jsonPath("$[1].amount").value(-100))
+                .andExpect(jsonPath("$[1].type").value("USE"));
+    }
+
+    //유저가 아닐 경우
+    @Test
+    void 유저가_아닐_경우_포인트히스토리를_조회할_수_없다()throws Exception {
+        //given
+        long userId = 0L;
+        given(pointService.getPointHistory(userId)).willThrow(new RuntimeException("유저가 존재하지 않습니다."));
+
+        //when
+        //then
+        mockMvc.perform(get("/point/{id}/histories", userId))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.code").value("500"))
+                .andExpect(jsonPath("$.message").value("에러가 발생했습니다."));
+    }
 }

@@ -1,6 +1,8 @@
 package io.hhplus.tdd.application;
 
 import io.hhplus.tdd.point.application.PointService;
+import io.hhplus.tdd.point.domain.PointHistory;
+import io.hhplus.tdd.point.domain.TransactionType;
 import io.hhplus.tdd.point.domain.UserPoint;
 import io.hhplus.tdd.point.infrastructure.PointHistoryRepository;
 import io.hhplus.tdd.point.infrastructure.UserPointRepository;
@@ -9,8 +11,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
@@ -70,5 +76,22 @@ public class PointServiceTest {
             pointService.getPoint(1);
         }).isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("포인트는 음수일 수 없다");
+    }
+
+    //히스토리 조회
+    @Test
+    void 사용자의_포인트히스토리를_조회_한다(){
+        //given
+        List<PointHistory> histories = List.of(
+                new PointHistory(1L, 4L, 100, TransactionType.CHARGE, System.currentTimeMillis()),
+                new PointHistory(2L, 4L, -100, TransactionType.USE, System.currentTimeMillis())
+        );
+        given(pointHistoryRepository.selectAllByUserId(anyLong())).willReturn(histories);
+
+        //when
+        List<PointHistory> result = pointService.getPointHistory(4L);
+
+        //then
+        assertEquals(histories, result);
     }
 }

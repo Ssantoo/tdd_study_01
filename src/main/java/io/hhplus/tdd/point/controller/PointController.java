@@ -1,6 +1,7 @@
 package io.hhplus.tdd.point.controller;
 
 import io.hhplus.tdd.point.application.PointService;
+import io.hhplus.tdd.point.controller.dto.PointHistoryResponse;
 import io.hhplus.tdd.point.controller.dto.UserPointResponse;
 import io.hhplus.tdd.point.domain.PointHistory;
 import io.hhplus.tdd.point.domain.UserPoint;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/point")
@@ -39,11 +41,20 @@ public class PointController {
     /**
      * TODO - 특정 유저의 포인트 충전/이용 내역을 조회하는 기능을 작성해주세요.
      */
-    @GetMapping("{id}/histories")
-    public List<PointHistory> history(
-            @PathVariable long id
-    ) {
-        return List.of();
+//    @GetMapping("{id}/histories")
+//    public List<PointHistory> history(
+//            @PathVariable long id
+//    ) {
+//        return List.of();
+//    }
+
+    @GetMapping("/{id}/histories")
+    public ResponseEntity<List<PointHistoryResponse>> history(@PathVariable long id) {
+        List<PointHistory> pointHistory = pointService.getPointHistory(id);
+        List<PointHistoryResponse> response = pointHistory.stream()
+                .map(PointHistoryResponse::from)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     /**
