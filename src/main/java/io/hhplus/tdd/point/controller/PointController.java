@@ -84,11 +84,20 @@ public class PointController {
     /**
      * TODO - 특정 유저의 포인트를 사용하는 기능을 작성해주세요.
      */
+//    @PatchMapping("{id}/use")
+//    public UserPoint use(
+//            @PathVariable long id,
+//            @RequestBody long amount
+//    ) {
+//        return new UserPoint(0, 0, 0);
+//    }
     @PatchMapping("{id}/use")
-    public UserPoint use(
+    public ResponseEntity<UserPointResponse> use(
             @PathVariable long id,
             @RequestBody long amount
     ) {
-        return new UserPoint(0, 0, 0);
+        UserPoint userPoint = pointService.usePoint(id, amount);
+        UserPointResponse response = UserPointResponse.from(userPoint);
+        return ResponseEntity.ok(response);
     }
 }

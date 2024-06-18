@@ -117,5 +117,45 @@ public class PointServiceTest {
         //히스토리 체크도? 히스토리가 1개 생긴다?
     }
 
+    //use
+    //포인트 사용
+    @Test
+    void 포인트를_사용한다() {
+        //given
+        UserPoint userPoint = new UserPoint(1L, 100L, System.currentTimeMillis());
+        given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
+        long amount = 50L;
+        long afterUse = userPoint.use(amount);
+
+        UserPoint updatedUserPoint = new UserPoint(1L, afterUse, System.currentTimeMillis());
+
+        given(userPointRepository.insertOrUpdate(anyLong(), eq(afterUse))).willReturn(updatedUserPoint);
+
+        //when
+        UserPoint result = pointService.usePoint(1L, amount);
+
+        //then
+        assertThat(result.point()).isEqualTo(50L);
+
+    }
+
+    //히스토리 체크도? 히스토리가 1개 생긴다?
+
+    //point가 amount보다 작을 수 없다
+    @Test
+    void 포인트가_부족하면_예외를_던진다() {
+        //given
+        UserPoint userPoint = new UserPoint(1L, 50L, System.currentTimeMillis());
+        given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
+        long amount = 100L;
+
+        //when
+        //then
+        assertThatThrownBy(()-> pointService.usePoint(1L, amount))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("포인트가 부족합니다.");
+
+    }
+
 
 }

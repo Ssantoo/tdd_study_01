@@ -32,12 +32,22 @@ public class PointService {
     public UserPoint chargePoint(long userId, long amount) {
         UserPoint userPoint = userPointRepository.selectById(userId);
         long afterCharge = userPoint.sum(amount);
-        //long afterCharge = userPoint.point() + amount;
         userPoint = userPointRepository.insertOrUpdate(userId, afterCharge);
 
         PointHistory pointHistory = new PointHistory(0L, userId, amount, TransactionType.CHARGE, System.currentTimeMillis());
         pointHistoryRepository.insert(pointHistory);
 
+        return userPoint;
+    }
+
+    public UserPoint usePoint(long userId, long amount) {
+        UserPoint userPoint = userPointRepository.selectById(userId);
+
+        long afterUse = userPoint.use(amount);
+        userPoint = userPointRepository.insertOrUpdate(userId, afterUse);
+
+        PointHistory pointHistory = new PointHistory(0L, userId, amount, TransactionType.USE, System.currentTimeMillis());
+        pointHistoryRepository.insert(pointHistory);
         return userPoint;
     }
 
