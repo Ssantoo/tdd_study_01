@@ -1,15 +1,21 @@
 package io.hhplus.tdd.point.application;
 
+import io.hhplus.tdd.point.domain.PointHistory;
+import io.hhplus.tdd.point.domain.TransactionType;
 import io.hhplus.tdd.point.domain.UserPoint;
+import io.hhplus.tdd.point.infrastructure.PointHistoryRepository;
 import io.hhplus.tdd.point.infrastructure.UserPointRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PointService {
 
     private final UserPointRepository userPointRepository;
+    private final PointHistoryRepository pointHistoryRepository;
 
     public UserPoint getPoint(long id) {
         UserPoint userPoint = userPointRepository.selectById(id);
@@ -18,4 +24,21 @@ public class PointService {
         }
         return userPoint;
     }
+
+    public List<PointHistory> getPointHistory(long userId) {
+        return pointHistoryRepository.selectAllByUserId(userId);
+    }
+
+    public UserPoint chargePoint(long userId, long amount) {
+        UserPoint userPoint = userPointRepository.selectById(userId);
+        long afterCharge = userPoint.sum(amount);
+        //long afterCharge = userPoint.point() + amount;
+        userPoint = userPointRepository.insertOrUpdate(userId, afterCharge);
+
+        PointHistory pointHistory = new PointHistory(0L, userId, amount, TransactionType.CHARGE, System.currentTimeMillis());
+        pointHistoryRepository.insert(pointHistory);
+
+        return userPoint;
+    }
+
 }

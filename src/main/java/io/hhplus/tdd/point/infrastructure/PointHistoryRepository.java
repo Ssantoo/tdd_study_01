@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface PointHistoryRepository {
     List<PointHistory> selectAllByUserId(long userId);
+
+    PointHistory insert(PointHistory pointHistory);
+
 }

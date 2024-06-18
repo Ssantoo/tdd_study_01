@@ -19,4 +19,9 @@ public class PointHistoryRepositoryImpl implements PointHistoryRepository {
         return pointHistoryTable.selectAllByUserId(userId);
     }
 
+    @Override
+    public PointHistory insert(PointHistory pointHistory) {
+        return pointHistoryTable.insert(pointHistory.userId(), pointHistory.amount(), pointHistory.type(), System.currentTimeMillis());
+    }
+
 }

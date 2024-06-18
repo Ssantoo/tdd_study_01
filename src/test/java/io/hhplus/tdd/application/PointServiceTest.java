@@ -18,6 +18,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 
 
@@ -94,4 +95,27 @@ public class PointServiceTest {
         //then
         assertEquals(histories, result);
     }
+
+    //charge
+    //service에서도 amount가 음수인거 체크?
+    @Test
+    void 포인트를_충전한다() {
+        //given
+        UserPoint userPoint = new UserPoint(1L, 100L, System.currentTimeMillis());
+        given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
+        long amount = 100L;
+        long afterCharge = userPoint.sum(amount);
+        UserPoint updatedUserPoint = new UserPoint(1L, afterCharge, System.currentTimeMillis());
+        given(userPointRepository.insertOrUpdate(anyLong(), eq(afterCharge))).willReturn(updatedUserPoint);
+
+        //when
+        UserPoint result = pointService.chargePoint(1L, amount);
+
+        //then
+        assertThat(result.point()).isEqualTo(200L);
+
+        //히스토리 체크도? 히스토리가 1개 생긴다?
+    }
+
+
 }
