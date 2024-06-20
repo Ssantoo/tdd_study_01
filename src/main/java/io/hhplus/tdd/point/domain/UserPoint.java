@@ -6,17 +6,21 @@ public record UserPoint(
         long updateMillis
 ) {
 
+    public UserPoint(long id, long point) {
+        this(id, point, System.currentTimeMillis());
+    }
+
     public static UserPoint empty(long id) {
         return new UserPoint(id, 0, System.currentTimeMillis());
     }
 
-    public long sum(long amount) {
-        return point + amount;
+    public UserPoint sum(long amount) {
+        return new UserPoint(id, point+amount, System.currentTimeMillis());
     }
 
-    public long use(long amount) {
+    public UserPoint use(long amount) {
         checkPoint(amount);
-        return point - amount;
+        return new UserPoint(id, point-amount, System.currentTimeMillis());
     }
 
     private void checkPoint(long amount) {

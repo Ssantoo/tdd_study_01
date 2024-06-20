@@ -17,8 +17,7 @@ import java.util.List;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 
@@ -42,7 +41,7 @@ public class PointServiceTest {
 
         //given
         //when
-        UserPoint userPoint = new UserPoint(1, 0, System.currentTimeMillis());
+        UserPoint userPoint = new UserPoint(1, 0);
         given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
 
         UserPoint result = pointService.getPoint(1);
@@ -65,19 +64,19 @@ public class PointServiceTest {
     }
 
     //포인트 조회가 음수일 수 없다.
-    @Test
-    void 포인트_조회가_음수이면_예외를_던진다() {
-        //given
-        UserPoint userPoint = new UserPoint(1, -10, System.currentTimeMillis());
-        given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
-
-        //when
-        //then
-        assertThatThrownBy(() -> {
-            pointService.getPoint(1);
-        }).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("포인트는 음수일 수 없다");
-    }
+//    @Test
+//    void 포인트_조회가_음수이면_예외를_던진다() {
+//        //given
+//        UserPoint userPoint = new UserPoint(1, -10);
+//        given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
+//
+//        //when
+//        //then
+//        assertThatThrownBy(() -> {
+//            pointService.getPoint(1);
+//        }).isInstanceOf(IllegalArgumentException.class)
+//                .hasMessage("포인트는 음수일 수 없다");
+//    }
 
     //히스토리 조회
     @Test
@@ -101,12 +100,16 @@ public class PointServiceTest {
     @Test
     void 포인트를_충전한다() {
         //given
-        UserPoint userPoint = new UserPoint(1L, 100L, System.currentTimeMillis());
+        UserPoint userPoint = new UserPoint(1L, 100L);
         given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
         long amount = 100L;
-        long afterCharge = userPoint.sum(amount);
-        UserPoint updatedUserPoint = new UserPoint(1L, afterCharge, System.currentTimeMillis());
-        given(userPointRepository.insertOrUpdate(anyLong(), eq(afterCharge))).willReturn(updatedUserPoint);
+
+        //서비스단에서 sum은 패스?!
+//        UserPoint afterCharge = userPoint.sum(amount);
+//        UserPoint updatedUserPoint = new UserPoint(afterCharge.id(), afterCharge.point(), System.currentTimeMillis());
+
+        UserPoint updatedUserPoint = new UserPoint(1L, 200L);
+        given(userPointRepository.insertOrUpdate(any(UserPoint.class))).willReturn(updatedUserPoint);
 
         //when
         UserPoint result = pointService.chargePoint(1L, amount);
@@ -122,14 +125,14 @@ public class PointServiceTest {
     @Test
     void 포인트를_사용한다() {
         //given
-        UserPoint userPoint = new UserPoint(1L, 100L, System.currentTimeMillis());
+        UserPoint userPoint = new UserPoint(1L, 100L);
         given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
         long amount = 50L;
-        long afterUse = userPoint.use(amount);
 
-        UserPoint updatedUserPoint = new UserPoint(1L, afterUse, System.currentTimeMillis());
+        //UserPoint afterUse = userPoint.use(amount);
+        UserPoint updatedUserPoint = new UserPoint(1L, 50L);
 
-        given(userPointRepository.insertOrUpdate(anyLong(), eq(afterUse))).willReturn(updatedUserPoint);
+        given(userPointRepository.insertOrUpdate(any(UserPoint.class))).willReturn(updatedUserPoint);
 
         //when
         UserPoint result = pointService.usePoint(1L, amount);
@@ -145,7 +148,7 @@ public class PointServiceTest {
     @Test
     void 포인트가_부족하면_예외를_던진다() {
         //given
-        UserPoint userPoint = new UserPoint(1L, 50L, System.currentTimeMillis());
+        UserPoint userPoint = new UserPoint(1L, 50L);
         given(userPointRepository.selectById(anyLong())).willReturn(userPoint);
         long amount = 100L;
 

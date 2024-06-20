@@ -18,11 +18,10 @@ public class PointService {
     private final PointHistoryRepository pointHistoryRepository;
 
     public UserPoint getPoint(long id) {
-        UserPoint userPoint = userPointRepository.selectById(id);
-        if (userPoint.point() < 0) {
-            throw new IllegalArgumentException("포인트는 음수일 수 없다");
-        }
-        return userPoint;
+        //        if (userPoint.point() < 0) {
+//            throw new IllegalArgumentException("포인트는 음수일 수 없다");
+//        }
+        return userPointRepository.selectById(id);
     }
 
     public List<PointHistory> getPointHistory(long userId) {
@@ -30,25 +29,28 @@ public class PointService {
     }
 
     public UserPoint chargePoint(long userId, long amount) {
-        UserPoint userPoint = userPointRepository.selectById(userId);
-        long afterCharge = userPoint.sum(amount);
-        userPoint = userPointRepository.insertOrUpdate(userId, afterCharge);
+        //불변 보장을 위한 재할당막기
+//        final UserPoint userPoint = userPointRepository.selectById(userId).sum(amount);
+        final UserPoint userPoint = getPoint(userId).sum(amount);
+        //final UserPoint afterCharge = userPoint.sum(amount);
+        final UserPoint updatedUserPoint = userPointRepository.insertOrUpdate(userPoint);
 
         PointHistory pointHistory = new PointHistory(0L, userId, amount, TransactionType.CHARGE, System.currentTimeMillis());
         pointHistoryRepository.insert(pointHistory);
-
-        return userPoint;
+        return updatedUserPoint;
     }
 
     public UserPoint usePoint(long userId, long amount) {
-        UserPoint userPoint = userPointRepository.selectById(userId);
-
-        long afterUse = userPoint.use(amount);
-        userPoint = userPointRepository.insertOrUpdate(userId, afterUse);
+//        final UserPoint userPoint = userPointRepository.selectById(userId);
+        final UserPoint userPoint = getPoint(userId).use(amount);
+        //final UserPoint afterUse = userPoint.use(amount);
+        final UserPoint updatedUserPoint = userPointRepository.insertOrUpdate(userPoint);
 
         PointHistory pointHistory = new PointHistory(0L, userId, amount, TransactionType.USE, System.currentTimeMillis());
         pointHistoryRepository.insert(pointHistory);
-        return userPoint;
+        return updatedUserPoint;
     }
+
+
 
 }

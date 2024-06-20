@@ -2,6 +2,7 @@ package io.hhplus.tdd.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.hhplus.tdd.point.application.PointService;
+import io.hhplus.tdd.point.controller.PointController;
 import io.hhplus.tdd.point.domain.PointHistory;
 import io.hhplus.tdd.point.domain.TransactionType;
 import io.hhplus.tdd.point.domain.UserPoint;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -24,8 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.mockito.BDDMockito.given;
 
-@SpringBootTest
+
 @AutoConfigureMockMvc
+@WebMvcTest(PointController.class)
 @ExtendWith(MockitoExtension.class)
 public class PointControllerTest {
 

@@ -5,5 +5,5 @@ import io.hhplus.tdd.point.domain.UserPoint;
 public interface UserPointRepository {
     UserPoint selectById(long id);
 
-    UserPoint insertOrUpdate(long userId, long afterCharge);
+    UserPoint insertOrUpdate(UserPoint userPoint);
 }
